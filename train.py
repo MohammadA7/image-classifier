@@ -44,4 +44,4 @@ if __name__ == "__main__":
 
     test_model(device, test_data_loader, model)
 
-    save_model(model, optimizer, class_to_idx, epochs, check_point_dir)
+    save_model(model, optimizer, class_to_idx, check_point_dir, arch, learning_rate, hidden_units)
