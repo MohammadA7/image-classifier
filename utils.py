@@ -30,6 +30,7 @@ def load_transform_data(data_dir):
     valid_data_loader = torch.utils.data.DataLoader(dataset=valid_image_datasets,batch_size=32)
     test_data_loader = torch.utils.data.DataLoader(dataset=test_image_datasets,batch_size=24)
 
+    print("Data loaders created ")
     return train_data_loader, valid_data_loader, test_data_loader, train_image_datasets.class_to_idx
 
 def build_model(arch, learning_rate, hidden_units, device, output_classes):
@@ -55,9 +56,11 @@ def build_model(arch, learning_rate, hidden_units, device, output_classes):
     optimizer = optim.Adam(model.classifier.parameters(), lr=learning_rate)
     criterion = nn.NLLLoss()
     model.to(device)
+    print("Model building finish")
     return model, optimizer, criterion
 
 def train_model(device, train_data_loader, valid_data_loader, model, epochs, optimizer, criterion):
+    print("Staring training")
     for i in range(epochs):
         model.train()
         training_loss = 0
@@ -99,8 +102,7 @@ def train_model(device, train_data_loader, valid_data_loader, model, epochs, opt
 def test_model(device, test_data_loader, model):
     accuracy = 0
     model.eval()
-    test_loss = 0
-    for images, labels in test_data_loaders:
+    for images, labels in test_data_loader:
         images, labels = images.to(device), labels.to(device)
         log_ps = model(images)
         preds = torch.exp(log_ps)
@@ -110,13 +112,15 @@ def test_model(device, test_data_loader, model):
         accuracy += torch.mean(equals.type(torch.FloatTensor))
     print("Model accuracy on test data: {:.3f}".format((accuracy/len(test_data_loader))*100) )
 
-def save_model(model, optimizer, class_to_idx, epochs, dir=''):
+def save_model(model, optimizer, class_to_idx, epochs, dir):
     checkpoint = {
               'state_dict': model.state_dict(),
               'class_to_idx': class_to_idx
               }
-    torch.save(checkpoint, dir + 'checkpoint.pth')
-    return dir + 'checkpoint.pth'
+    path = dir + 'checkpoint.pth'
+    torch.save(checkpoint, path)
+    
+    print(f"Model successfully saved in {path}")
 
 # def load_model(checkpoint_file, arch, learning_rate, hidden_units, device, output_classes):
 #     checkpoint = torch.load(checkpoint_file)
